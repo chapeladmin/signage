@@ -1,0 +1,12 @@
+{
+  "name"         : "signage-synch",
+  "version"      : "0.0.1",
+  "description"  : "Synchronize with signage server",
+  "main"         : "server.js",
+  "author"       : "Micah Bucy",
+  "dependencies" : {
+    "express"    : "latest",
+    "request"    : "latest",
+    "cheerio"    : "latest"
+  }
+}
