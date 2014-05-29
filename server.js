@@ -75,12 +75,13 @@ var writeAsset = function(url, asset_path, callback) {
                         var data = JSON.parse(data);
                         if(data.code == 200 && data.md5sum == md5sum) {
                             console.log(getTimeString() + " " + getBasename(file_path) + " is already up to date");
-                            return;
+                            return callback();
                         }
                     }
                     return updateAsset(url, asset_path, callback);
                 });
             });
+            return;
         }
         else {
             return updateAsset(url, asset_path, callback);
