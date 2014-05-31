@@ -109,27 +109,27 @@ var synchronize = function() {
                             var script_url = $(this).attr('src');
                             var script_path = template + '/' + script_url.split(template + '/')[1];
                             tasks.push(async.apply(writeAsset, script_url, asset_dir + script_path));
-                            $(this).attr('src', '/' + script_path);
+                            $(this).attr('src', script_path);
                         });
                         $('link').each(function() {
                             var style_url = $(this).attr('href');
                             var style_path = template + '/' + style_url.split(template + '/')[1];
                             tasks.push(async.apply(writeAsset, style_url, asset_dir + style_path));
-                            $(this).attr('href', '/' + style_path);
+                            $(this).attr('href', style_path);
                         });
                         $('img').each(function() {
                             var img_url = $(this).attr('src');
                             var basename = getBasename(img_url);
                             var img_path = 'images/' + basename;
                             tasks.push(async.apply(writeAsset, img_url, asset_dir + img_path));
-                            $(this).attr('src', '/' + img_path);
+                            $(this).attr('src', img_path);
                         });
                         $('video').each(function() {
                             var video_url = $(this).attr('src');
                             var basename = getBasename(video_url);
                             var video_path = 'videos/' + basename;
                             tasks.push(async.apply(writeAsset, video_url, asset_dir + video_path));
-                            $(this).attr('src', '/' + video_path);
+                            $(this).attr('src', video_path);
                         });
                         async.parallel(tasks, function(err, results) {
                             if(!err) {
