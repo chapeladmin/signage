@@ -15,16 +15,22 @@ var getTimeString = function() {
     var hours = current_time.getHours();
     var minutes = current_time.getMinutes();
     var seconds = current_time.getSeconds();
+    var month = current_time.getMonth() + 1;
+    var day = current_time.getDate();
+    var year = current_time.getFullYear();
     if (hours < 10) {
-        hours = "0" + hours
+        hours = "0" + hours;
     }
     if (minutes < 10) {
-        minutes = "0" + minutes
+        minutes = "0" + minutes;
     }
     if (seconds < 10) {
-        seconds = "0" + seconds
+        seconds = "0" + seconds;
     }
-    return hours + ":" + minutes + ":" + seconds
+    if (day < 10) {
+        day = "0" + day;
+    }
+    return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds
 };
 
 var getBasename = function(str) {
@@ -35,9 +41,18 @@ var mkdirp = function(real_path, mode) {
     var path_from_root = real_path.split(asset_dir)[1],
         path_array = path_from_root.split(path.sep),
         create_path = asset_dir;
+    if(!fs.existsSync(create_path)) {
+        try {
+            fs.mkdirSync(create_path, mode);
+        } catch(e) {
+            return false;
+        }
+        console.log(getTimeString() + " " + 'mkdir: ' + create_path);
+    }
     for(var i=0, path_count=path_array.length;i<path_count;i++) {
         segment = path_array[i];
         create_path = path.resolve(create_path, segment);
+        console.log(create_path);
         if(!fs.existsSync(create_path)) {
             try {
                 fs.mkdirSync(create_path, mode);
@@ -101,8 +116,10 @@ var synchronize = function() {
                 var group = remote_config.group_name;
                 var template = remote_config.template;
                 var player_url = config.host + '/' + template + '?group_name=' + group;
+                console.log(player_url);
                 request(player_url, function(error, response, html) {
                     if(!error) {
+                        console.log("loading remote html");
                         var $ = cheerio.load(html);
                         var tasks = [];
                         $('script').each(function() {
@@ -128,8 +145,12 @@ var synchronize = function() {
                             var video_url = $(this).attr('src');
                             var basename = getBasename(video_url);
                             var video_path = 'videos/' + basename;
+                            var poster_url = $(this).attr('poster');
+                            var poster_basename = getBasename(poster_url);
+                            var poster_path = 'images/' + poster_basename;
                             tasks.push(async.apply(writeAsset, video_url, asset_dir + video_path));
-                            $(this).attr('src', video_path);
+                            tasks.push(async.apply(writeAsset, poster_url, asset_dir + poster_path));
+                            $(this).attr('src', video_path).attr('poster', poster_path);
                         });
                         async.parallel(tasks, function(err, results) {
                             if(!err) {
